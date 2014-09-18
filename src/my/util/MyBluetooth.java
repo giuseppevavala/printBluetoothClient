@@ -62,7 +62,7 @@ public class MyBluetooth {
 		Log.e (TAG, "Creazione MyBluetooth FAILED");
 	}
 	
-	public void connectToServer ()
+	public void connectToServer (String totale, String carta)
 	{
 		Log.v (TAG, "updating services...");		
 		serverDevice.fetchUuidsWithSdp();
@@ -79,7 +79,7 @@ public class MyBluetooth {
 			
 			socket.connect();
 			OutputStream out = socket.getOutputStream();
-			out.write ((new String("CIAO")).getBytes());
+			out.write ((new String("totale=" + totale + ";carta=" + carta)).getBytes());
 			out.close();
 		} catch (Exception e) {
 			e.printStackTrace();

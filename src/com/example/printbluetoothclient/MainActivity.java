@@ -29,7 +29,7 @@ public class MainActivity extends ActionBarActivity {
 			public void onClick(View v) {
 				Log.v (TAG, "Button click");
 				MyBluetooth bluetooth = new MyBluetooth(myActivity);
-				bluetooth.connectToServer();
+				bluetooth.connectToServer("1200.0", "xxxx-xxxx-xxxx-xxxx");
 			}
 		});
 		
