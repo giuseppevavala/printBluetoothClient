@@ -1,6 +1,7 @@
 package my.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Set;
@@ -62,15 +63,9 @@ public class MyBluetooth {
 		Log.e (TAG, "Creazione MyBluetooth FAILED");
 	}
 	
-	public void connectToServer (String totale, String carta)
+	public int connectToServer (String totale, String carta)
 	{
-		Log.v (TAG, "updating services...");		
-		serverDevice.fetchUuidsWithSdp();
-		ParcelUuid[] list = serverDevice.getUuids();
-		for (ParcelUuid elem : list) {
-			Log.v (TAG, elem.toString());
-		}
-		
+		Log.v (TAG, "connection...");	
 		BluetoothSocket socket = null;
 		try {
 			
@@ -79,8 +74,17 @@ public class MyBluetooth {
 			
 			socket.connect();
 			OutputStream out = socket.getOutputStream();
-			out.write ((new String("totale=" + totale + ";carta=" + carta)).getBytes());
+			InputStream in = socket.getInputStream();
+			out.write ((new String("totale=" + totale + ";carta=" + carta +"&")).getBytes());
+			Log.v (TAG, "sent string");
+			
+			int ris = in.read();
+			out.write(0);
+			Log.v (TAG, "Receive code: " + ris);
+			
 			out.close();
+			Log.v (TAG, "close");
+			return ris;
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -93,7 +97,7 @@ public class MyBluetooth {
 			}
 		}
 		
-		
+		return -1;
 		
 		
 	}

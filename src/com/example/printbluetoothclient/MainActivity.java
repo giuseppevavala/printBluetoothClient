@@ -8,11 +8,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.TextView;
 
 public class MainActivity extends ActionBarActivity {
 
 	private static final String TAG = "MainActivity";
 	private View button;
+	private MyBluetooth bluetooth;
+	private TextView label;
 	
 	
 	@Override
@@ -22,14 +25,18 @@ public class MainActivity extends ActionBarActivity {
 		final MainActivity myActivity = this;
 		
 		setContentView(R.layout.activity_main);
+		bluetooth = new MyBluetooth(myActivity);
+		
+		
+		label = (TextView)findViewById(R.id.textView1);
 		
 		button = findViewById(R.id.button1);
 		button.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				Log.v (TAG, "Button click");
-				MyBluetooth bluetooth = new MyBluetooth(myActivity);
-				bluetooth.connectToServer("1200.0", "xxxx-xxxx-xxxx-xxxx");
+				int val = bluetooth.connectToServer("1200.0", "xxxx-xxxx-xxxx-xxxx");
+				label.setText("result: " + val);
 			}
 		});
 		
