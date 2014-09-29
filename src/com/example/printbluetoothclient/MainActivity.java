@@ -1,35 +1,51 @@
 package com.example.printbluetoothclient;
 
-import my.util.MyBluetooth;
-import android.support.v7.app.ActionBarActivity;
+import my.util.MailManager;
+import my.util.MyGcm;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.TextView;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 
 public class MainActivity extends ActionBarActivity {
-
-	private static final String TAG = "MainActivity";
-	private View button;
-	private MyBluetooth bluetooth;
-	private TextView label;
+	private BroadcastReceiver updateListViewReceiver = new BroadcastReceiver() {
+		@Override
+	    public void onReceive(Context context, Intent intent) {
+			Log.i (TAG, "Ricevuto messaggio di update");
+			myactivity.updateListView();
+	    }
+	};
 	
+	
+	private static final String TAG = "MainActivity";
+	private static MainActivity myactivity = null;
+	private ListView listView;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-		final MainActivity myActivity = this;
-		
 		setContentView(R.layout.activity_main);
-		bluetooth = new MyBluetooth(myActivity);
+		
+		myactivity = this;
+		
+		MyGcm mygcm = new MyGcm(this);
+		mygcm.checkPlayServices();
+		
+		IntentFilter intentFilter = new IntentFilter("update");
+		registerReceiver(updateListViewReceiver, intentFilter);
+		
+		updateListView();
+		//bluetooth = new MyBluetooth(myActivity);
 		
 		
-		label = (TextView)findViewById(R.id.textView1);
-		
+		//Intent intent = new Intent(this, PrintBluetoothService.class);
+		//startService(intent);
+		/*
 		button = findViewById(R.id.button1);
 		button.setOnClickListener(new OnClickListener() {
 			@Override
@@ -39,25 +55,22 @@ public class MainActivity extends ActionBarActivity {
 				label.setText("result: " + val);
 			}
 		});
-		
+		*/
 	}
-
+	
+	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
+	protected void onResume() {
+		super.onResume();
+		updateListView();
 	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
+	
+	public void updateListView() {
+		ListAdapter adapter = new MySimpleArrayAdapter(getApplicationContext(), MailManager.getIstance().getMails());
+		listView = (ListView) findViewById(R.id.listView1);
+		listView.setAdapter(adapter);
+		listView.invalidateViews();
 	}
 }
+
+
