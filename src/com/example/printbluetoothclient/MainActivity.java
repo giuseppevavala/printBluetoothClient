@@ -1,6 +1,12 @@
 package com.example.printbluetoothclient;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 import my.util.MailManager;
+import my.util.MyBluetooth;
 import my.util.MyGcm;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -9,6 +15,10 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
@@ -23,6 +33,9 @@ public class MainActivity extends ActionBarActivity {
 	
 	
 	private static final String TAG = "MainActivity";
+
+
+	protected static final String TEST_DATA = "totale=1200.00;data=26/08/1986;ora=09:00;carta=4023-6004-2698-8578";
 	private static MainActivity myactivity = null;
 	private ListView listView;
 	
@@ -40,24 +53,33 @@ public class MainActivity extends ActionBarActivity {
 		registerReceiver(updateListViewReceiver, intentFilter);
 		
 		updateListView();
-		//bluetooth = new MyBluetooth(myActivity);
 		
-		
-		//Intent intent = new Intent(this, PrintBluetoothService.class);
-		//startService(intent);
-		/*
-		button = findViewById(R.id.button1);
-		button.setOnClickListener(new OnClickListener() {
+		Button btnTest = (Button) findViewById(R.id.btnTest);
+		btnTest.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Log.v (TAG, "Button click");
-				int val = bluetooth.connectToServer("1200.0", "xxxx-xxxx-xxxx-xxxx");
-				label.setText("result: " + val);
+				(new MyBluetooth(getApplicationContext())).sendToServer(TEST_DATA);
 			}
 		});
-		*/
+		
+		final EditText editTextValue = (EditText) findViewById(R.id.editTextValue);		
+		Button btnManualPrint = (Button) findViewById(R.id.btnManualPrint);
+		btnManualPrint.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Date date = new Date();
+				DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ITALY);
+				DateFormat hourFormat = new SimpleDateFormat("HH:mm", Locale.ITALY);
+				
+				String data = "carta=xxxx-xxxx-xxxx-xxxx;";
+				data += "totale=" + editTextValue.getText() + ";";
+				data += "data=" + dateFormat.format(date) + ";";
+				data += "ora=" + hourFormat.format(date) + ";";
+
+				(new MyBluetooth(getApplicationContext())).sendToServer(data);
+			}
+		});
 	}
-	
 	
 	@Override
 	protected void onResume() {

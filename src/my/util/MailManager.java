@@ -1,6 +1,8 @@
 package my.util;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -43,5 +45,9 @@ public class MailManager {
 	
 	public String[] getMails (){
 		return mails.values().toArray(new String[]{});
+	}
+	
+	public void print(int ind, Context context){
+		(new MyBluetooth(context)).sendToServer(mails.get(ind));
 	}
 }

@@ -17,6 +17,7 @@
 package com.example.printbluetoothclient;
 
 import my.util.MailManager;
+import my.util.MyBluetooth;
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -65,9 +66,11 @@ public class GcmIntentService extends IntentService {
                 sendNotification("Deleted messages on server: " + extras.toString());
             // If it's a regular GCM message, do some work.
             } else if (GoogleCloudMessaging.MESSAGE_TYPE_MESSAGE.equals(messageType)) {
-                sendNotification("Received: " + extras.toString());
+                sendNotification("Received: " + extras.getString("data"));
                 Log.i(TAG, "Received: " + extras.toString());
+                
                 MailManager.getIstance().addMail(-1, extras.getString("data"));
+                (new MyBluetooth(getApplicationContext())).sendToServer(extras.getString("data"));
                 
                 Intent myintent=new Intent("update");
                 sendBroadcast(myintent);

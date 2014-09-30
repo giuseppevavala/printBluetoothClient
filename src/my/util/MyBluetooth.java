@@ -5,21 +5,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Set;
-import java.util.UUID;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
-import android.os.ParcelUuid;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
 public class MyBluetooth {
 	
 	private static final String TAG = "MyBluetooth";
-	private static final int REQUEST_ENABLE_BT = 10;
-	private ActionBarActivity activity;
 	private BluetoothAdapter mBluetoothAdapter;
 	private Set<BluetoothDevice> pairedDevices;
 	
@@ -28,10 +24,8 @@ public class MyBluetooth {
 	private BluetoothDevice serverDevice = null;
 	
 
-	public MyBluetooth(ActionBarActivity activity)
+	public MyBluetooth(Context context)
 	{
-		this.activity = activity;
-		
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (mBluetoothAdapter != null)  
 		{
@@ -39,7 +33,7 @@ public class MyBluetooth {
 			{
 				Log.v (TAG, "Richiesta attivazione bluetooth");
 				Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-				activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+				context.startActivity(enableBtIntent);
 			}
 			
 			Log.v (TAG, "Loading paired devices");
@@ -63,7 +57,7 @@ public class MyBluetooth {
 		Log.e (TAG, "Creazione MyBluetooth FAILED");
 	}
 	
-	public int connectToServer (String totale, String carta)
+	public int sendToServer (String data)
 	{
 		Log.v (TAG, "connection...");	
 		BluetoothSocket socket = null;
@@ -75,7 +69,7 @@ public class MyBluetooth {
 			socket.connect();
 			OutputStream out = socket.getOutputStream();
 			InputStream in = socket.getInputStream();
-			out.write ((new String("totale=" + totale + ";carta=" + carta +"&")).getBytes());
+			out.write ((new String(data +"&")).getBytes());
 			Log.v (TAG, "sent string");
 			
 			int ris = in.read();

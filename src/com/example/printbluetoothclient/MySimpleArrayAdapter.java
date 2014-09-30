@@ -1,12 +1,15 @@
 package com.example.printbluetoothclient;
 
 
+import my.util.MyBluetooth;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class MySimpleArrayAdapter extends ArrayAdapter<String> {
@@ -20,13 +23,21 @@ public class MySimpleArrayAdapter extends ArrayAdapter<String> {
   }
 
   @SuppressLint("ViewHolder")
-@Override
-  public View getView(int position, View convertView, ViewGroup parent) {
+  @Override
+  public View getView(final int position, View convertView, ViewGroup parent) {
     LayoutInflater inflater = (LayoutInflater) context
         .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     View rowView = inflater.inflate(R.layout.rowlayout, parent, false);
     TextView text = (TextView)rowView.findViewById(R.id.textId);
     text.setText(values[position]);
+    
+    Button printBtn = (Button)rowView.findViewById(R.id.btnPrint);
+    printBtn.setOnClickListener(new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			(new MyBluetooth(getContext())).sendToServer(values[position]);
+		}
+	});
     
     return rowView;
   }
