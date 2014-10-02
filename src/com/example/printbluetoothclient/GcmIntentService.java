@@ -70,8 +70,8 @@ public class GcmIntentService extends IntentService {
                 Log.i(TAG, "Received: " + extras.toString());
                 
                 try {
-                	MailManager.getIstance().addMail(-1, extras.getString("data"));
-					(new MyBluetooth(getApplicationContext())).sendToServer(extras.getString("data"));
+                	if (MailManager.getIstance().addMail(-1, extras.getString("data")) >= 0)
+                		(new MyBluetooth(getApplicationContext())).sendToServer(extras.getString("data"));
 					Intent myintent=new Intent("update");
 					sendBroadcast(myintent);
 				} catch (Exception e) {

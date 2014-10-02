@@ -8,12 +8,24 @@ import java.util.Locale;
 import my.util.MailManager;
 import my.util.MyBluetooth;
 import my.util.MyGcm;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONArray;
+
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -22,12 +34,13 @@ import android.widget.EditText;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+@SuppressLint("HandlerLeak")
 public class MainActivity extends ActionBarActivity {
 	private BroadcastReceiver updateListViewReceiver = new BroadcastReceiver() {
 		@Override
 	    public void onReceive(Context context, Intent intent) {
 			Log.i (TAG, "Ricevuto messaggio di update");
-			myactivity.updateListView();
+			myactivity.updateMessages();
 	    }
 	};
 	
@@ -93,15 +106,61 @@ public class MainActivity extends ActionBarActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		updateListView();
+		updateMessages();		
 	}
 	
-	public void updateListView() {
+	public void updateMessages() {
+		(new Thread(new Runnable() {
+			@Override
+			public void run() {
+				getHistoryMessage();
+				getMessageFinishHandler.sendEmptyMessage(0);
+			}
+		})).start();
+	}
+	
+	private void updateListView() {
 		ListAdapter adapter = new MySimpleArrayAdapter(getApplicationContext(), MailManager.getIstance().getMails());
 		listView = (ListView) findViewById(R.id.listView1);
 		listView.setAdapter(adapter);
 		listView.invalidateViews();
 	}
+	
+	
+	private void getHistoryMessage() {
+		Log.i (TAG, "Ottengo la lista dei messaggi");
+		
+		// Create a new HttpClient and Post Header
+	    HttpClient httpclient = new DefaultHttpClient();
+	    HttpGet httpget = new HttpGet("http://pacific-dusk-5592.herokuapp.com/message");
+
+	    try {
+	        String authorizationString = "Basic " + Base64.encodeToString(("mobile" + ":" + "lam1apassw0rds1cur1ss1ma").getBytes(), Base64.DEFAULT); 
+	        httpget.setHeader("Authorization", authorizationString);
+
+	        // Execute HTTP Post Request
+	        HttpResponse response = httpclient.execute(httpget);
+	        
+	        JSONArray array = new JSONArray(EntityUtils.toString(response.getEntity()));
+	        
+	        MailManager.getIstance().clear();
+	        for (int i = 0; i < array.length(); i++)
+	        	MailManager.getIstance().addMail(-1, array.getString(i));
+	        
+	        Log.i (TAG, array.toString());
+	        
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    } 
+	}
+	
+	
+	private Handler getMessageFinishHandler = new Handler() {
+        public void handleMessage(Message msg) {
+        	super.handleMessage(msg);
+        	updateListView();
+        }
+    };
 }
 
 

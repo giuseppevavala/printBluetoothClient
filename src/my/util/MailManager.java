@@ -23,20 +23,27 @@ public class MailManager {
 	}
 	
 	public int addMail(int ind, String text){
-		if (ind == -1)
-		{
-			mails.put(count.getAndIncrement() , text);
-			return 0;
-		}
+		int ris = 0;
 		
-		if (mails.get(ind) == null){
-			count.getAndIncrement();
-			mails.put(ind, text);
-			return 0;
-		}
+		if (mails.containsValue(text))
+			ris = -1;
 		else
-			return 1;
-			
+		{
+			if (ind == -1)
+			{
+				mails.put(count.getAndIncrement() , text);
+			}
+			else
+			{
+				if (mails.get(ind) == null){
+					count.getAndIncrement();
+					mails.put(ind, text);
+				}
+				else
+					ris = -1;
+			}
+		}
+		return ris;
 	}
 	
 	public String getMail(int ind){
@@ -54,4 +61,12 @@ public class MailManager {
 			e.printStackTrace();
 		}
 	}
+	
+	
+	public void clear(){
+		count = new AtomicInteger(0);
+		mails.clear();
+	}
 }
+
+
