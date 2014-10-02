@@ -48,6 +48,10 @@ public class MailManager {
 	}
 	
 	public void print(int ind, Context context){
-		(new MyBluetooth(context)).sendToServer(mails.get(ind));
+		try {
+			(new MyBluetooth(context)).sendToServer(mails.get(ind));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

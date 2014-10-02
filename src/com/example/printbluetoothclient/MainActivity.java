@@ -58,7 +58,11 @@ public class MainActivity extends ActionBarActivity {
 		btnTest.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				(new MyBluetooth(getApplicationContext())).sendToServer(TEST_DATA);
+				try {
+					(new MyBluetooth(getApplicationContext())).sendToServer(TEST_DATA);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		});
 		
@@ -76,7 +80,12 @@ public class MainActivity extends ActionBarActivity {
 				data += "data=" + dateFormat.format(date) + ";";
 				data += "ora=" + hourFormat.format(date) + ";";
 
-				(new MyBluetooth(getApplicationContext())).sendToServer(data);
+				try {
+					(new MyBluetooth(getApplicationContext())).sendToServer(data);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		});
 	}

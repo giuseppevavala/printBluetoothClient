@@ -35,7 +35,11 @@ public class MySimpleArrayAdapter extends ArrayAdapter<String> {
     printBtn.setOnClickListener(new OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			(new MyBluetooth(getContext())).sendToServer(values[position]);
+			try {
+				(new MyBluetooth(getContext())).sendToServer(values[position]);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	});
     

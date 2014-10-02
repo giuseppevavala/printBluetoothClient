@@ -69,11 +69,16 @@ public class GcmIntentService extends IntentService {
                 sendNotification("Received: " + extras.getString("data"));
                 Log.i(TAG, "Received: " + extras.toString());
                 
-                MailManager.getIstance().addMail(-1, extras.getString("data"));
-                (new MyBluetooth(getApplicationContext())).sendToServer(extras.getString("data"));
+                try {
+                	MailManager.getIstance().addMail(-1, extras.getString("data"));
+					(new MyBluetooth(getApplicationContext())).sendToServer(extras.getString("data"));
+					Intent myintent=new Intent("update");
+					sendBroadcast(myintent);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
                 
-                Intent myintent=new Intent("update");
-                sendBroadcast(myintent);
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
